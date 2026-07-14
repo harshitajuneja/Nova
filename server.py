@@ -605,7 +605,7 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     PUBLIC.mkdir(exist_ok=True)
-    srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
+    srv = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"Nova is listening on http://localhost:{PORT}"
           + ("  (Claude answers: ON)" if ANTHROPIC_KEY else "  (Claude answers: off — set ANTHROPIC_API_KEY to enable)"))
     srv.serve_forever()
