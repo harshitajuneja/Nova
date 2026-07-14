@@ -474,9 +474,10 @@ def answer_question(q):
                 want_fc = bool(re.search(r"\b(forecast|tomorrow)\b", q, re.I))
                 try:
                     out = weather_answer(place, want_fc)
-                except Exception:
+                except Exception as e:
+                    print(f"[nova] weather_answer failed: {type(e).__name__}: {e}")
                     out = {"answer": "The weather service seems unreachable right now — "
-                                     "please try again in a moment.", "sources": []}
+                                    "please try again in a moment.", "sources": []}
             else:
                 out = {"answer": "Sure — which city's weather would you like? "
                                  "For example, ask: what's the weather in Hyderabad?", "sources": []}
