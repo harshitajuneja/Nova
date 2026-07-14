@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "nova",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-u", "server.py"],
+      "port": 8765
+    }
+  ]
+}

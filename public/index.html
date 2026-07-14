@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nova — voice assistant with a human face</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗣️</text></svg>" />
+</head>
+<body data-state="idle">
+  <header>
+    <div class="brand">
+      <span class="orb"></span>
+      <h1>Nova</h1>
+      <span class="tagline">ask with your voice · answered from the live web · spoken back to you</span>
+    </div>
+    <div class="statusline"><span class="status-dot"></span><span id="status-text">Loading…</span></div>
+  </header>
+
+  <main>
+    <!-- ============================ avatar ============================ -->
+    <section class="avatar-card">
+      <div id="avatar-box">
+        <canvas id="avatar-canvas" width="768" height="768"></canvas>
+        <div class="ring"></div>
+        <div class="wave"><i></i><i></i><i></i><i></i><i></i></div>
+
+        <button id="calibrate-btn" title="Avatar settings & calibration">⚙</button>
+
+        <div class="dot" id="dot-eyeL" data-label="left eye"></div>
+        <div class="dot" id="dot-eyeR" data-label="right eye"></div>
+        <div class="dot" id="dot-mouth" data-label="mouth"></div>
+        <div class="dot" id="dot-chin" data-label="chin"></div>
+
+        <div id="calibrate-panel">
+          <h3>Avatar studio</h3>
+          <p>Drag the four dots onto the eyes, mouth and chin. Test the muscles:</p>
+          <label>jaw <input type="range" id="dbg-jaw" min="0" max="1" step="0.01" value="0"></label>
+          <label>wide <input type="range" id="dbg-wide" min="0" max="1" step="0.01" value="0"></label>
+          <label>round <input type="range" id="dbg-round" min="0" max="1" step="0.01" value="0"></label>
+          <label>press <input type="range" id="dbg-press" min="0" max="1" step="0.01" value="0"></label>
+          <label>brow <input type="range" id="dbg-brow" min="0" max="1" step="0.01" value="0"></label>
+          <label>blink <input type="range" id="dbg-blink" min="0" max="1" step="0.01" value="0"></label>
+          <div class="row">
+            <button id="new-face" class="pill">🎲 new face</button>
+            <label class="pill" for="upload-face">📷 upload photo<input type="file" id="upload-face" accept="image/*" hidden></label>
+            <button id="reset-layout" class="pill">reset dots</button>
+          </div>
+        </div>
+      </div>
+      <div class="under-avatar">
+        <button id="mic-btn" title="Talk to Nova (or press Space)">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3zm5.3-3a5.3 5.3 0 0 1-10.6 0H4.6a7.4 7.4 0 0 0 6.4 7.3V21h2v-2.7a7.4 7.4 0 0 0 6.4-7.3z"/></svg>
+        </button>
+        <button id="stop-btn" title="Stop speaking">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        </button>
+        <span id="face-note"></span>
+      </div>
+      <p id="mic-note"></p>
+    </section>
+
+    <!-- ============================ conversation ============================ -->
+    <section class="panel">
+      <div class="bubble you">
+        <span class="who">You</span>
+        <p id="transcript">Tap the mic and ask something…</p>
+      </div>
+      <div class="bubble nova">
+        <span class="who">Nova <em id="intent-badge"></em></span>
+        <p id="answer">Hi! Ask me about the weather in any city, the latest news, a fact, a date, or a quick calculation.</p>
+        <div id="sources"></div>
+      </div>
+
+      <div class="examples">
+        <button class="example">What is the weather in Hyderabad?</button>
+        <button class="example">Who is A.P.J. Abdul Kalam?</button>
+        <button class="example">What time is it in Tokyo?</button>
+        <button class="example">Latest news about ISRO</button>
+        <button class="example">What is 128 times 46?</button>
+      </div>
+
+      <form id="ask-form" autocomplete="off">
+        <input id="ask-input" type="text" placeholder="…or type your question and press Enter" />
+        <button type="submit">Ask</button>
+      </form>
+
+      <div class="controls">
+        <label>Voice <select id="voice-select"></select></label>
+        <label>Speed <input id="rate-slider" type="range" min="0.7" max="1.4" step="0.1" value="1.0"><span id="rate-val">1.0×</span></label>
+        <label>Mic language
+          <select id="lang-select">
+            <option value="en-US">English (US)</option>
+            <option value="en-IN">English (India)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="hi-IN">हिन्दी</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="handsfree"> hands-free</label>
+      </div>
+
+      <div class="chips">
+        <span class="chip" id="chip-stt">speech→text <b>–</b></span>
+        <span class="chip" id="chip-answer">web answer <b>–</b></span>
+        <span class="chip" id="chip-tts">voice starts <b>–</b></span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Live-rendered avatar (WebGL, ~60 fps, zero video-generation latency) · answers via Open-Meteo, Wikipedia,
+    DuckDuckGo &amp; Google News · profanity &amp; harmful-content filter on every question and answer.
+  </footer>
+
+  <script src="visemes.js"></script>
+  <script src="avatar.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
