@@ -475,7 +475,7 @@ def answer_question(q):
                 try:
                     out = weather_answer(place, want_fc)
                 except Exception as e:
-                    print(f"[nova] weather_answer failed: {type(e).__name__}: {e}")
+                    print(f"[nova] weather_answer FAILED for place={place!r}: {type(e).__name__}: {e}")
                     out = {"answer": "The weather service seems unreachable right now — "
                                     "please try again in a moment.", "sources": []}
             else:
@@ -573,7 +573,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path == "/api/answer":
                 q = (qs.get("q", [""])[0])[:500]
-                self._send(200, answer_question(q))
+                t0 = time.time()
+                result = answer_question(q)
+                print(f"[nova] q={q!r} intent={result.get('intent')} took={int((time.time()-t0)*1000)}ms")
+                self._send(200, result)
             elif path == "/api/face":
                 self._send(200, fetch_face(force_new="new" in qs))
             elif path == "/api/health":
